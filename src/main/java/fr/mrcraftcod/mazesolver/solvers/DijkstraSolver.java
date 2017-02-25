@@ -1,19 +1,28 @@
-package fr.mrcraftcod.mazesolver;
+package fr.mrcraftcod.mazesolver.solvers;
 
+import fr.mrcraftcod.mazesolver.SortedArrayList;
 import fr.mrcraftcod.mazesolver.maze.Maze;
 import fr.mrcraftcod.mazesolver.maze.MazeNode;
 import javafx.concurrent.Task;
-import java.util.ArrayList;
+import java.util.Comparator;
 /**
  * Created by Thomas Couchoud (MrCraftCod - zerderr@gmail.com) on 25/02/2017.
  *
  * @author Thomas Couchoud
  * @since 2017-02-25
  */
-public class DijkstraSolver extends Task<MazeNode>
+public abstract class DijkstraSolver extends Task<Integer>
 {
 	private final Maze maze;
 	private final int interval;
+	private Comparator<MazeNode> comparator;
+
+	public DijkstraSolver(Maze maze, int interval, Comparator<MazeNode> comparator)
+	{
+		this.maze = maze;
+		this.interval = interval;
+		this.comparator = comparator;
+	}
 
 	public DijkstraSolver(Maze maze, int interval)
 	{
@@ -21,21 +30,28 @@ public class DijkstraSolver extends Task<MazeNode>
 		this.interval = interval;
 	}
 
+	public void setComparator(Comparator<MazeNode> comparator)
+	{
+		this.comparator = comparator;
+	}
+
 	@Override
-	protected MazeNode call() throws Exception
+	protected Integer call() throws Exception
 	{
 		if(maze == null)
-			return null;
-		ArrayList<MazeNode> queue = new ArrayList<>();
+			return 0;
+		int explored = 0;
+		SortedArrayList<MazeNode> queue = new SortedArrayList<>(comparator);
 		queue.add(maze.getStart());
 		while(queue.size() > 0)
 		{
+			explored++;
 			MazeNode node = queue.get(0);
 			queue.remove(0);
 			if(node.isEnd())
 			{
 				maze.drawPath();
-				return node;
+				return explored;
 			}
 			for(MazeNode neighbor : node.getNeighbors())
 			{
@@ -47,7 +63,7 @@ public class DijkstraSolver extends Task<MazeNode>
 						neighbor.setExplored();
 						neighbor.setPrevious(node);
 						neighbor.setDistance(distance);
-						queue.add(neighbor);
+						queue.insertSorted(neighbor);
 					}
 				}
 				else
@@ -55,7 +71,7 @@ public class DijkstraSolver extends Task<MazeNode>
 					neighbor.setExplored();
 					neighbor.setPrevious(node);
 					neighbor.setDistance(distance);
-					queue.add(neighbor);
+					queue.insertSorted(neighbor);
 				}
 				maze.drawExplored(node, neighbor);
 			}
@@ -70,10 +86,10 @@ public class DijkstraSolver extends Task<MazeNode>
 					e.printStackTrace();
 				}
 		}
-		return null;
+		return explored;
 	}
 
-	private static double findDistance(MazeNode n1, MazeNode n2)
+	protected double findDistance(MazeNode n1, MazeNode n2)
 	{
 		return Math.sqrt(Math.pow(n1.getX() - n2.getX(), 2) + Math.pow(n1.getY() - n2.getY(), 2));
 	}

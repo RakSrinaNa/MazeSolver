@@ -1,10 +1,13 @@
 package fr.mrcraftcod.mazesolver.jfx;
 
+import fr.mrcraftcod.mazesolver.Main;
 import fr.mrcraftcod.utils.javafx.ApplicationBase;
+import fr.mrcraftcod.utils.resources.ResourcesBase;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -24,7 +27,13 @@ public class MainApplication extends ApplicationBase
 	@Override
 	public String getFrameTitle()
 	{
-		return "DijkstraSolver";
+		return "MazeSolver";
+	}
+
+	@Override
+	public Image getIcon()
+	{
+		return new ResourcesBase(Main.class).getImage(() -> "jfx", "icon.png", 256, 256);
 	}
 
 	@Override

@@ -135,16 +135,19 @@ public class Maze
 
 	private void drawPath(MazeNode n1, MazeNode n2, Color color)
 	{
-		int minX = Math.min(n1.getX(), n2.getX());
-		int maxX = Math.max(n1.getX(), n2.getX());
-		int minY = Math.min(n1.getY(), n2.getY());
-		int maxY = Math.max(n1.getY(), n2.getY());
-		for(int x = minX; x <= maxX; x++)
-			for(int y = minY; y <= maxY; y++)
-				image.getPixelWriter().setColor(x, y, color);
+		Platform.runLater(() ->
+		{
+			int minX = Math.min(n1.getX(), n2.getX());
+			int maxX = Math.max(n1.getX(), n2.getX());
+			int minY = Math.min(n1.getY(), n2.getY());
+			int maxY = Math.max(n1.getY(), n2.getY());
+			for(int x = minX; x <= maxX; x++)
+				for(int y = minY; y <= maxY; y++)
+					image.getPixelWriter().setColor(x, y, color);
+		});
 	}
 
-	private MazeNode getEnd()
+	public MazeNode getEnd()
 	{
 		return nodes.stream().filter(MazeNode::isEnd).findFirst().orElse(null);
 	}
@@ -173,6 +176,14 @@ public class Maze
 				for(int y = 0; y < getImage().getHeight(); y++)
 					if(!getImage().getPixelReader().getColor(x, y).equals(Color.BLACK))
 						getImage().getPixelWriter().setColor(x, y, Color.WHITE);
+		});
+	}
+
+	public void drawNodes()
+	{
+		Platform.runLater(() -> {
+			for(MazeNode node : nodes)
+				getImage().getPixelWriter().setColor(node.getX(), node.getY(), Color.GREEN);
 		});
 	}
 }

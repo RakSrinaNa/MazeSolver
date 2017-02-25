@@ -1,6 +1,7 @@
 package fr.mrcraftcod.mazesolver;
 
 import fr.mrcraftcod.mazesolver.maze.Maze;
+import fr.mrcraftcod.mazesolver.solvers.DijkstraFIFOSolver;
 import fr.mrcraftcod.utils.FileUtils;
 /**
  * Created by Thomas Couchoud (MrCraftCod - zerderr@gmail.com) on 25/02/2017.
@@ -13,7 +14,9 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 		Maze maze = new Maze(FileUtils.askFile());
-		new DijkstraSolver(maze, 0).call();
+		Thread t = new Thread(() -> new DijkstraFIFOSolver(maze, 0));
+		t.start();
+		t.wait();
 		maze.drawPath();
 		maze.saveMaze();
 	}

@@ -1,11 +1,15 @@
 package fr.mrcraftcod.mazesolver.jfx;
 
 import com.sun.tools.corba.se.idl.InvalidArgument;
-import fr.mrcraftcod.mazesolver.DijkstraSolver;
 import fr.mrcraftcod.mazesolver.maze.Maze;
+import fr.mrcraftcod.mazesolver.solvers.DijkstraShortestFlightSolver;
+import fr.mrcraftcod.mazesolver.solvers.DijkstraSolver;
 import javafx.scene.image.ImageView;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 /**
  * Created by Thomas Couchoud (MrCraftCod - zerderr@gmail.com) on 25/02/2017.
  *
@@ -20,13 +24,29 @@ public class MazeContainer extends ImageView
 	{
 		super();
 		setPreserveRatio(true);
+		setSmooth(true);
+		setCache(true);
 	}
 
 	public void solveMaze(int interval)
 	{
 		if(maze == null)
 			return;
-		new Thread(new DijkstraSolver(maze, interval)).start();
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		DijkstraSolver solver = new DijkstraShortestFlightSolver(maze, interval);
+		solver.setOnSucceeded(evt ->
+		{
+			try
+			{
+				System.out.println("Explored " + solver.get() + " nodes");
+			}
+			catch(InterruptedException | ExecutionException e)
+			{
+				e.printStackTrace();
+			}
+		});
+		executorService.submit(solver);
+		executorService.shutdown();
 	}
 
 	public void loadMaze(File file)
@@ -35,6 +55,7 @@ public class MazeContainer extends ImageView
 		{
 			maze = new Maze(file);
 			setImage(maze.getImage());
+			//maze.drawNodes();
 		}
 		catch(InvalidArgument | IOException invalidArgument)
 		{
