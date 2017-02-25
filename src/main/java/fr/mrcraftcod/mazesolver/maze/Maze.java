@@ -1,6 +1,7 @@
 package fr.mrcraftcod.mazesolver.maze;
 
 import com.sun.tools.corba.se.idl.InvalidArgument;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -161,5 +162,17 @@ public class Maze
 	public void saveMaze() throws IOException
 	{
 		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(file.getParentFile(), "done" + System.currentTimeMillis() % 1000 + "_" + file.getName()));
+	}
+
+	public void reset()
+	{
+		for(MazeNode node : nodes)
+			node.reset();
+		Platform.runLater(() -> {
+			for(int x = 0; x < getImage().getWidth(); x++)
+				for(int y = 0; y < getImage().getHeight(); y++)
+					if(!getImage().getPixelReader().getColor(x, y).equals(Color.BLACK))
+						getImage().getPixelWriter().setColor(x, y, Color.WHITE);
+		});
 	}
 }

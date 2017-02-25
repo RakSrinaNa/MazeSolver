@@ -2,12 +2,8 @@ package fr.mrcraftcod.mazesolver.jfx;
 
 import com.sun.tools.corba.se.idl.InvalidArgument;
 import fr.mrcraftcod.mazesolver.DijkstraSolver;
-import fr.mrcraftcod.mazesolver.interfaces.DrawListener;
 import fr.mrcraftcod.mazesolver.maze.Maze;
-import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 /**
@@ -16,7 +12,7 @@ import java.io.IOException;
  * @author Thomas Couchoud
  * @since 2017-02-25
  */
-public class MazeContainer extends ImageView implements DrawListener
+public class MazeContainer extends ImageView
 {
 	private Maze maze;
 
@@ -26,11 +22,11 @@ public class MazeContainer extends ImageView implements DrawListener
 		setPreserveRatio(true);
 	}
 
-	public void solveMaze()
+	public void solveMaze(int interval)
 	{
 		if(maze == null)
 			return;
-		new Thread(new DijkstraSolver(maze)).start();
+		new Thread(new DijkstraSolver(maze, interval)).start();
 	}
 
 	public void loadMaze(File file)
@@ -46,12 +42,6 @@ public class MazeContainer extends ImageView implements DrawListener
 		}
 	}
 
-	@Override
-	public void onDrawPath(int x, int y, Color color)
-	{
-		Platform.runLater(() -> ((WritableImage) this.getImage()).getPixelWriter().setArgb(x, y, color.getRGB()));
-	}
-
 	public void saveMaze()
 	{
 		if(maze == null)
@@ -64,5 +54,10 @@ public class MazeContainer extends ImageView implements DrawListener
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void resetMaze()
+	{
+		maze.reset();
 	}
 }

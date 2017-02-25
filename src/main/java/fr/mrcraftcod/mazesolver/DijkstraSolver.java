@@ -13,10 +13,12 @@ import java.util.ArrayList;
 public class DijkstraSolver extends Task<MazeNode>
 {
 	private final Maze maze;
+	private final int interval;
 
-	public DijkstraSolver(Maze maze)
+	public DijkstraSolver(Maze maze, int interval)
 	{
 		this.maze = maze;
+		this.interval = interval;
 	}
 
 	@Override
@@ -58,14 +60,15 @@ public class DijkstraSolver extends Task<MazeNode>
 				maze.drawExplored(node, neighbor);
 			}
 			node.setExplored();
-			try
-			{
-				Thread.sleep(10);
-			}
-			catch(InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+			if(interval > 0)
+				try
+				{
+					Thread.sleep(interval);
+				}
+				catch(InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 		}
 		return null;
 	}

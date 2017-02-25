@@ -3,7 +3,10 @@ package fr.mrcraftcod.mazesolver.jfx;
 import fr.mrcraftcod.utils.javafx.ApplicationBase;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -41,12 +44,20 @@ public class MainApplication extends ApplicationBase
 	{
 		BorderPane root = new BorderPane();
 
-		VBox vBox = new VBox();
+		VBox imageBox = new VBox();
 		MazeContainer mazeContainer = new MazeContainer();
 		mazeContainer.fitWidthProperty().bind(root.widthProperty());
-		mazeContainer.fitHeightProperty().bind(vBox.heightProperty());
-		vBox.getChildren().addAll(mazeContainer);
+		mazeContainer.fitHeightProperty().bind(imageBox.heightProperty());
+		imageBox.getChildren().addAll(mazeContainer);
 		VBox.setVgrow(mazeContainer, Priority.ALWAYS);
+
+		HBox intervalBox = new HBox();
+		Label intervalLabel = new Label("Interval: ");
+		TextArea intervalField = new TextArea("1");
+		intervalField.setMaxWidth(Double.MAX_VALUE);
+		intervalField.setMaxHeight(1);
+		intervalBox.getChildren().addAll(intervalLabel, intervalField);
+		HBox.setHgrow(intervalField, Priority.ALWAYS);
 
 		Button selectMaze = new Button("Select Maze");
 		selectMaze.setMaxWidth(Double.MAX_VALUE);
@@ -54,16 +65,20 @@ public class MainApplication extends ApplicationBase
 
 		Button solveMaze = new Button("Solve Maze");
 		solveMaze.setMaxWidth(Double.MAX_VALUE);
-		solveMaze.setOnAction(evt -> mazeContainer.solveMaze());
+		solveMaze.setOnAction(evt -> mazeContainer.solveMaze(Integer.parseInt(intervalField.getText())));
 
 		Button saveMaze = new Button("Save maze");
 		saveMaze.setMaxWidth(Double.MAX_VALUE);
 		saveMaze.setOnAction(evt -> mazeContainer.saveMaze());
 
-		VBox buttons = new VBox();
-		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze);
+		Button resetMaze = new Button("Reset maze");
+		resetMaze.setMaxWidth(Double.MAX_VALUE);
+		resetMaze.setOnAction(evt -> mazeContainer.resetMaze());
 
-		root.setCenter(vBox);
+		VBox buttons = new VBox();
+		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze, resetMaze, intervalBox);
+
+		root.setCenter(imageBox);
 		root.setBottom(buttons);
 		return root;
 	}

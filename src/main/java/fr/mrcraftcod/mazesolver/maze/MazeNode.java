@@ -126,4 +126,15 @@ public class MazeNode
 	{
 		return previous;
 	}
+
+	public void reset()
+	{
+		explored = false;
+		distance = -1;
+		previous = null;
+		if(isStart())
+			setStart();
+		else if(isEnd())
+			setEnd();
+	}
 }
