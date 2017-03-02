@@ -55,7 +55,6 @@ public class MazeContainer extends ImageView
 		{
 			maze = new Maze(file);
 			setImage(maze.getImage());
-			//maze.drawNodes();
 		}
 		catch(InvalidArgument | IOException invalidArgument)
 		{
@@ -80,5 +79,10 @@ public class MazeContainer extends ImageView
 	public void resetMaze()
 	{
 		maze.reset();
+	}
+
+	public void showNodes()
+	{
+		maze.drawNodes();
 	}
 }

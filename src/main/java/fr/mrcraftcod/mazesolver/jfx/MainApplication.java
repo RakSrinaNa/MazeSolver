@@ -84,8 +84,12 @@ public class MainApplication extends ApplicationBase
 		resetMaze.setMaxWidth(Double.MAX_VALUE);
 		resetMaze.setOnAction(evt -> mazeContainer.resetMaze());
 
+		Button showNodes = new Button("Show nodes");
+		showNodes.setMaxWidth(Double.MAX_VALUE);
+		showNodes.setOnAction(evt -> mazeContainer.showNodes());
+
 		VBox buttons = new VBox();
-		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze, resetMaze, intervalBox);
+		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze, resetMaze, showNodes, intervalBox);
 
 		root.setCenter(imageBox);
 		root.setBottom(buttons);
