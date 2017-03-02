@@ -51,19 +51,13 @@ public class Maze
 		for(int y = 0; y < image.getHeight(); y++)
 			for(int x = 1; x < image.getWidth(); x++)
 			{
-				MazeNode node = getNode(image, x, y);
+				MazeNode node = getNode(image, x, y, y == 0 || y == image.getHeight() - 1);
 				if(node != null)
-				{
-					if(y == 0)
-						node.setStart();
-					else if(y == image.getHeight() - 1)
-						node.setEnd();
 					nodes.add(node);
-				}
 			}
 	}
 
-	private MazeNode getNode(WritableImage image, int x, int y)
+	private MazeNode getNode(WritableImage image, int x, int y, boolean special)
 	{
 		if(isWall(image, x, y) == 1)
 			return null;
@@ -71,7 +65,7 @@ public class Maze
 		int down = isWall(image, x, y + 1);
 		int left = isWall(image, x - 1, y);
 		int right = isWall(image, x + 1, y);
-		if(left + right == 1 || up + down == 1 || left + right + up == 0 || left + right + down == 0)
+		if(isNode(up, down, left, right))
 		{
 			MazeNode node = new MazeNode(new Point(x, y));
 			if(up == 0)
@@ -92,9 +86,31 @@ public class Maze
 					linkNode.addNeighbor(node);
 				}
 			}
+			if(special)
+			{
+				if(y == 0)
+					node.setStart();
+				else
+					node.setEnd();
+			}
+			else if(isDeadEnd(up, down, left, right))
+			{
+				node.setExplored();
+				node.setDistance(Double.MIN_VALUE);
+			}
 			return node;
 		}
 		return null;
+	}
+
+	private boolean isDeadEnd(int up, int down, int left, int right)
+	{
+		return up + down + left == 3 || up + down + right == 3 || left + right + up == 3 || left + right + down == 3;
+	}
+
+	private boolean isNode(int up, int down, int left, int right)
+	{
+		return left + right == 1 || up + down == 1 || left + right + up == 0 || left + right + down == 0;
 	}
 
 	private MazeNode getLeftNode(MazeNode node)
@@ -135,16 +151,13 @@ public class Maze
 
 	private void drawPath(MazeNode n1, MazeNode n2, Color color)
 	{
-		Platform.runLater(() ->
-		{
-			int minX = Math.min(n1.getX(), n2.getX());
-			int maxX = Math.max(n1.getX(), n2.getX());
-			int minY = Math.min(n1.getY(), n2.getY());
-			int maxY = Math.max(n1.getY(), n2.getY());
-			for(int x = minX; x <= maxX; x++)
-				for(int y = minY; y <= maxY; y++)
-					image.getPixelWriter().setColor(x, y, color);
-		});
+		int minX = Math.min(n1.getX(), n2.getX());
+		int maxX = Math.max(n1.getX(), n2.getX());
+		int minY = Math.min(n1.getY(), n2.getY());
+		int maxY = Math.max(n1.getY(), n2.getY());
+		for(int x = minX; x <= maxX; x++)
+			for(int y = minY; y <= maxY; y++)
+				drawNode(x, y, color);
 	}
 
 	public MazeNode getEnd()
@@ -164,7 +177,7 @@ public class Maze
 
 	public void saveMaze() throws IOException
 	{
-		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(file.getParentFile(), "done" + System.currentTimeMillis() % 1000 + "_" + file.getName()));
+		saveMaze(new File(file.getParentFile(), "done" + System.currentTimeMillis() % 1000 + "_" + file.getName()));
 	}
 
 	public void reset()
@@ -185,5 +198,20 @@ public class Maze
 			for(MazeNode node : nodes)
 				getImage().getPixelWriter().setColor(node.getX(), node.getY(), Color.GREEN);
 		});
+	}
+
+	public void drawNode(int x, int y, Color color)
+	{
+		Platform.runLater(() -> image.getPixelWriter().setColor(x, y, color));
+	}
+
+	public void drawNode(MazeNode node, Color color)
+	{
+		drawNode(node.getX(), node.getY(), color);
+	}
+
+	public void saveMaze(File file) throws IOException
+	{
+		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 	}
 }

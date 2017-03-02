@@ -4,6 +4,7 @@ import fr.mrcraftcod.mazesolver.SortedArrayList;
 import fr.mrcraftcod.mazesolver.maze.Maze;
 import fr.mrcraftcod.mazesolver.maze.MazeNode;
 import javafx.concurrent.Task;
+import javafx.scene.paint.Color;
 import java.util.Comparator;
 /**
  * Created by Thomas Couchoud (MrCraftCod - zerderr@gmail.com) on 25/02/2017.
@@ -48,6 +49,7 @@ public abstract class DijkstraSolver extends Task<Integer>
 			explored++;
 			MazeNode node = queue.get(0);
 			queue.remove(0);
+			maze.drawNode(node, Color.BLUE);
 			if(node.isEnd())
 			{
 				maze.drawPath();
@@ -73,7 +75,6 @@ public abstract class DijkstraSolver extends Task<Integer>
 					neighbor.setDistance(distance);
 					queue.insertSorted(neighbor);
 				}
-				maze.drawExplored(node, neighbor);
 			}
 			node.setExplored();
 			if(interval > 0)
@@ -85,6 +86,8 @@ public abstract class DijkstraSolver extends Task<Integer>
 				{
 					e.printStackTrace();
 				}
+			for(MazeNode neighbor : node.getNeighbors())
+				maze.drawExplored(node, neighbor);
 		}
 		return explored;
 	}
