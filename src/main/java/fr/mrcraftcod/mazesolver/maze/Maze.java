@@ -61,6 +61,7 @@ public class Maze
 	{
 		if(isWall(image, x, y) == 1)
 			return null;
+		System.out.println("Found node at (" + x + ";" + y + ")");
 		int up = isWall(image, x, y - 1);
 		int down = isWall(image, x, y + 1);
 		int left = isWall(image, x - 1, y);
@@ -115,12 +116,28 @@ public class Maze
 
 	private MazeNode getLeftNode(MazeNode node)
 	{
-		return nodes.stream().filter(streamNode -> node.getY() == streamNode.getY() && node.getX() > streamNode.getX()).min(Comparator.comparingInt(n -> Math.abs(n.getX() - node.getX()))).orElse(null);
+		int minX = 0;
+		for(int x = node.getX(); x >= 0; x--)
+			if(isWall(image, x, node.getY()) == 1)
+			{
+				minX = x;
+				break;
+			}
+		int finalMinX = minX;
+		return nodes.stream().filter(streamNode -> node.getY() == streamNode.getY() && node.getX() > streamNode.getX() && streamNode.getX() > finalMinX).min(Comparator.comparingInt(n -> Math.abs(n.getX() - node.getX()))).orElse(null);
 	}
 
 	private MazeNode getUpperNode(MazeNode node)
 	{
-		return nodes.stream().filter(streamNode -> node.getX() == streamNode.getX() && node.getY() > streamNode.getY()).min(Comparator.comparingInt(n -> Math.abs(n.getY() - node.getY()))).orElse(null);
+		int minY = 0;
+		for(int y = node.getY(); y >= 0; y--)
+			if(isWall(image, node.getX(), y) == 1)
+			{
+				minY = y;
+				break;
+			}
+		int finalMinY = minY;
+		return nodes.stream().filter(streamNode -> node.getX() == streamNode.getX() && node.getY() > streamNode.getY() && streamNode.getY() > finalMinY).min(Comparator.comparingInt(n -> Math.abs(n.getY() - node.getY()))).orElse(null);
 	}
 
 	private int isWall(WritableImage image, int x, int y)
