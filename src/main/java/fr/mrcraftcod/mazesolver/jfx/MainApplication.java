@@ -6,6 +6,7 @@ import fr.mrcraftcod.utils.resources.ResourcesBase;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -53,10 +54,13 @@ public class MainApplication extends ApplicationBase
 	{
 		BorderPane root = new BorderPane();
 
+		ProgressBar progress = new ProgressBar();
+
 		VBox imageBox = new VBox();
 		MazeContainer mazeContainer = new MazeContainer();
 		mazeContainer.fitWidthProperty().bind(root.widthProperty());
 		mazeContainer.fitHeightProperty().bind(imageBox.heightProperty());
+		mazeContainer.setProgressBarProperty(progress.progressProperty());
 		imageBox.getChildren().addAll(mazeContainer);
 		VBox.setVgrow(mazeContainer, Priority.ALWAYS);
 
@@ -88,8 +92,8 @@ public class MainApplication extends ApplicationBase
 		showNodes.setMaxWidth(Double.MAX_VALUE);
 		showNodes.setOnAction(evt -> mazeContainer.showNodes());
 
-		VBox buttons = new VBox();
-		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze, resetMaze, showNodes, intervalBox);
+		HBox buttons = new HBox();
+		buttons.getChildren().addAll(selectMaze, solveMaze, saveMaze, resetMaze, showNodes, intervalBox, progress);
 
 		root.setCenter(imageBox);
 		root.setBottom(buttons);

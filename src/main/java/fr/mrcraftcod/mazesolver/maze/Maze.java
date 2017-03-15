@@ -2,6 +2,7 @@ package fr.mrcraftcod.mazesolver.maze;
 
 import com.sun.tools.corba.se.idl.InvalidArgument;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * @author Thomas Couchoud
  * @since 2017-02-25
  */
-public class Maze
+public class Maze extends Task<Integer>
 {
 	private final ArrayList<MazeNode> nodes;
 	private final File file;
@@ -31,7 +32,6 @@ public class Maze
 		this.file = file;
 		nodes = new ArrayList<>();
 		image = SwingFXUtils.toFXImage(ImageIO.read(file), null);
-		getNodes(image);
 	}
 
 	@Override
@@ -44,17 +44,21 @@ public class Maze
 		return sb.toString();
 	}
 
-	private void getNodes(WritableImage image)
+	private int getNodes(WritableImage image)
 	{
 		if(image == null)
-			return;
+			return 0;
+		int max = (int) (image.getWidth() * image.getHeight());
+		int current = 0;
 		for(int y = 0; y < image.getHeight(); y++)
 			for(int x = 1; x < image.getWidth(); x++)
 			{
 				MazeNode node = getNode(image, x, y, y == 0 || y == image.getHeight() - 1);
 				if(node != null)
 					nodes.add(node);
+				updateProgress(current, max);
 			}
+		return nodes.size();
 	}
 
 	private MazeNode getNode(WritableImage image, int x, int y, boolean special)
@@ -116,28 +120,12 @@ public class Maze
 
 	private MazeNode getLeftNode(MazeNode node)
 	{
-		int minX = 0;
-		for(int x = node.getX(); x >= 0; x--)
-			if(isWall(image, x, node.getY()) == 1)
-			{
-				minX = x;
-				break;
-			}
-		int finalMinX = minX;
-		return nodes.stream().filter(streamNode -> node.getY() == streamNode.getY() && node.getX() > streamNode.getX() && streamNode.getX() > finalMinX).min(Comparator.comparingInt(n -> Math.abs(n.getX() - node.getX()))).orElse(null);
+		return nodes.stream().filter(streamNode -> node.getY() == streamNode.getY() && node.getX() > streamNode.getX()).min(Comparator.comparingInt(n -> Math.abs(n.getX() - node.getX()))).orElse(null);
 	}
 
 	private MazeNode getUpperNode(MazeNode node)
 	{
-		int minY = 0;
-		for(int y = node.getY(); y >= 0; y--)
-			if(isWall(image, node.getX(), y) == 1)
-			{
-				minY = y;
-				break;
-			}
-		int finalMinY = minY;
-		return nodes.stream().filter(streamNode -> node.getX() == streamNode.getX() && node.getY() > streamNode.getY() && streamNode.getY() > finalMinY).min(Comparator.comparingInt(n -> Math.abs(n.getY() - node.getY()))).orElse(null);
+		return nodes.stream().filter(streamNode -> node.getX() == streamNode.getX() && node.getY() > streamNode.getY()).min(Comparator.comparingInt(n -> Math.abs(n.getY() - node.getY()))).orElse(null);
 	}
 
 	private int isWall(WritableImage image, int x, int y)
@@ -230,5 +218,11 @@ public class Maze
 	public void saveMaze(File file) throws IOException
 	{
 		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+	}
+
+	@Override
+	protected Integer call() throws Exception
+	{
+		return getNodes(image);
 	}
 }

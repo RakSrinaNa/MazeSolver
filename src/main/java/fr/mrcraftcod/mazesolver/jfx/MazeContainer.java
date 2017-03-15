@@ -4,6 +4,7 @@ import com.sun.tools.corba.se.idl.InvalidArgument;
 import fr.mrcraftcod.mazesolver.maze.Maze;
 import fr.mrcraftcod.mazesolver.solvers.DijkstraShortestFlightSolver;
 import fr.mrcraftcod.mazesolver.solvers.DijkstraSolver;
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.image.ImageView;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.concurrent.Executors;
 public class MazeContainer extends ImageView
 {
 	private Maze maze;
+	private DoubleProperty progressBarProperty;
 
 	public MazeContainer()
 	{
@@ -55,6 +57,11 @@ public class MazeContainer extends ImageView
 		{
 			maze = new Maze(file);
 			setImage(maze.getImage());
+			if(progressBarProperty != null)
+				progressBarProperty.bind(maze.progressProperty());
+			ExecutorService executorService = Executors.newSingleThreadExecutor();
+			executorService.submit(maze);
+			executorService.shutdown();
 		}
 		catch(InvalidArgument | IOException invalidArgument)
 		{
@@ -84,5 +91,15 @@ public class MazeContainer extends ImageView
 	public void showNodes()
 	{
 		maze.drawNodes();
+	}
+
+	public Maze getMaze()
+	{
+		return maze;
+	}
+
+	public void setProgressBarProperty(DoubleProperty progressBarProperty)
+	{
+		this.progressBarProperty = progressBarProperty;
 	}
 }
